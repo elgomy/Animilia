@@ -1,0 +1,105 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-button/paper-button.html">
+
+<link rel="import" href="../polymerfire/polymerfire.html">
+
+<link rel="import" href="/animilia-behavior.html">
+
+
+<!--
+`complaint-list-animilia`
+lista de denuncias creadas en Animilia y almacenadas en Firebase
+
+@demo demo/index.html 
+-->
+
+<dom-module id="complaint-list-animilia">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-card{
+          margin-bottom:10px;
+      }
+    </style>
+
+        <firebase-app 
+            auth-domain="form-polymerfire.firebaseapp.com"
+            database-url="https://form-polymerfire.firebaseio.com"
+            api-key="AIzaSyCqn8S15HxxOj3-racdBVhRozgeFUYdFww"
+            name="form-polymerfire">
+    </firebase-app>
+
+<!-- sistema de login -->
+    <firebase-auth 
+            app-name="form-polymerfire"
+            id="auth" 
+            user="{{user}}" 
+            on-error="handleError"
+            signed-in="{{logueado}}">
+    </firebase-auth>
+
+    <paper-button raised on-tap="login" hidden="{{logueado}}">login</paper-button>
+    <paper-button raised on-tap="logout" hidden="{{!logueado}}">logout</paper-button>
+
+
+    <firebase-query
+            id="query"
+            app-name="form-polymerfire"
+            path="/denuncias/dZBSeSvvhdfuTakkXiOcBTCNKt43"
+            data="{{data}}">
+    </firebase-query>
+
+    <template is="dom-repeat" items="[[data]]" as="complaint">         
+
+    <paper-card 
+            heading="[[complaint.identificador]]" 
+            image="https://t1.ea.ltmcdn.com/es/images/9/7/5/img_nombres_para_perros_originales_y_bonitos_5579_paso_1_600.jpg" 
+
+            alt="[[complaint.identificador]]">
+          
+          <div class="card-content">
+            [[complaint.descripcion]]
+          </div>
+    <div class="card-actions">
+        <paper-button complaint="[[complaint]]" on-tap="edition">Editar</paper-button>
+        <paper-button complaint="[[complaint]]" on-tap="remove">Deletar</paper-button>
+        <paper-button>Enviar</paper-button>
+    </div>
+    </paper-card>
+
+  </template>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'complaint-list-animilia',
+
+      properties:{
+        data:Object,
+        complaint:Object
+      },
+
+      behaviors:[Polymer.animiliaBehavior],
+
+     remove:function(e) {
+      
+      this.delete(e.currentTarget.complaint);
+      
+     },
+
+     edition:function(e){
+      this.edit(e)
+     }
+
+      
+    
+
+    });
+  </script>
+</dom-module>
