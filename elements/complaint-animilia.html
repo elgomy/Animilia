@@ -30,14 +30,7 @@ formulario de entrada de denuncias de maltrato animal
           value="{{identificador}}">          
     </paper-input>
 
-    <paper-input  
-          id="placeInput" 
-          label="lugar"
-          required
-          on-keydown="validateNull"
-          error-message="necessário incluir um lugar"
-          value="{{lugar}}">
-    </paper-input>
+ 
 
     <paper-textarea 
           id="textInput" 
@@ -61,12 +54,6 @@ formulario de entrada de denuncias de maltrato animal
       properties: {
         
 
-          // lugar de la denuncia. Substituiremos esta propiedad por un componente de Google maps
-          lugar:{
-            type:String,
-            notify: true,
-            value: ''
-          },
           // identificador de la denuncia que servirá para el usuario identificar sus denuncias. Probablemente excluiremos esta propiedad
           identificador:{
             type:String,
@@ -83,7 +70,7 @@ formulario de entrada de denuncias de maltrato animal
           inputs:{
             type:Array,
             value: function(){
-              return [this.$.idInput,this.$.placeInput,this.$.textInput]
+              return [this.$.idInput,this.$.textInput]
             },
             notify: true,
           }       

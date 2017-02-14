@@ -1,0 +1,143 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/geo-location/geo-location.html">
+<link rel="import" href="../bower_components/google-apis/google-maps-api.html">
+<link rel="import" href="../bower_components/google-map/google-map.html">
+<link rel="import" href="../bower_components/google-map/google-map-marker.html">
+<link rel="import" href="../bower_components/google-map/google-map-search.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+
+<!--
+`current-location`
+componente para fijar la ubicación actual del usuario con Google Maps
+
+@demo demo/index.html 
+-->
+
+<dom-module id="current-location">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      google-map{ /* OJO, si no damos dimension al mapa no aparecerá por pantalla*/
+        height: 300px;
+       
+      }
+
+    </style>
+
+      
+     <p>Onde?</p>   
+     <paper-spinner active="{{spinnerActivate}}"></paper-spinner>
+     {{address}}  
+      
+
+   
+      <google-maps-api 
+              api-key="AIzaSyBQmrFhtdagQZRAZps26eOV5qZ5z3wndxA">
+      </google-maps-api>  
+
+      <geo-location 
+              latitude="{{lat}}"
+              longitude="{{lng}}"
+              watch-pos 
+              high-accuracy
+              on-geo-error="geoError"
+              on-geo-response="locationLoad">
+      </geo-location>
+
+     
+      <google-map 
+              id="map" 
+              api-key="AIzaSyBQmrFhtdagQZRAZps26eOV5qZ5z3wndxA" 
+              latitude="{{lat}}" 
+              longitude="{{lng}}"
+              fit-to-markers
+              zoom="16"
+              disable-default-ui>    
+
+        <google-map-marker 
+              title="você está aqui"
+              latitude="{{lat}}" 
+              longitude="{{lng}}"
+              icon="../images/perro2.png">         
+
+         </google-map-marker> 
+
+  </google-map>   
+
+  <paper-fab icon="done" on-tap="confirmLocation"></paper-fab>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'current-location',
+
+      properties: {
+
+            // propiedad donde almacenamos la latitud de las coordenadas devueltas por el componente de geolocalización y que nos servirá para bindeársela al mapa para centrarlo, y también para dibujar un marcador de nuestra posición
+        lat:{
+          type:Number,
+          notify:true
+          
+         // observer: "latChange"
+        },
+
+        lng:{
+          type:Number,
+          notify:true
+          
+        },
+        // activa el <paper-spinner> hasta que el componente <geo-location> devuelva a dirección del usuario
+        spinnerActivate:{
+          type:Boolean,
+          value:true,
+          reflectToAttribute: true
+        },
+        // propiedad donde almacenaremos la dirección devuelta por el componente <geo-location> en formato legible
+        address:{
+          type:String,
+          notify:true
+        
+        }
+        
+      },
+
+
+      geoError:function(){
+        console.log('Oops!! parece que houve um erro')
+      },
+
+      locationLoad: function() {
+          
+          var latlng={lat:this.lat, lng:this.lng};
+          var geocoder = new window.google.maps.Geocoder; // -19.928246399999985, -43.96192849999999
+          geocoder.geocode({'location':latlng}, function(results){
+            var geoAddress = results[0].formatted_address;
+            console.log(geoAddress);
+            this.set('address',geoAddress);
+            this.set('spinnerActivate', false)
+            
+          }.bind(this))
+         
+    },
+
+    confirmLocation:function(){
+      console.log(this.address)
+    }
+
+  
+
+ 
+
+     
+
+    });
+  </script>
+</dom-module>

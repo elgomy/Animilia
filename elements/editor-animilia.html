@@ -5,8 +5,11 @@
 <link rel="import" href="../behaviors/toast-behavior.html">
 <link rel="import" href="../behaviors/input-behavior.html">
 
+
 <!-- componente <complaint-animilia> -->
 <link rel="import" href="complaint-animilia.html">
+<!-- componente <current-location.html> -->
+<link rel="import" href="current-location.html">
 
 <!-- imports que corresponden al componente <complaint-animilia> -->
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
@@ -34,11 +37,15 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
     </firebase-auth>
     
     <complaint-animilia
-          lugar="{{complaint.lugar}}"
+       
           identificador="{{complaint.identificador}}"     
           descripcion="{{complaint.descripcion}}"       
           inputs="{{inputs}}"
     ></complaint-animilia>
+
+    <current-location
+          address="{{complaint.address}}">
+    </current-location>
 
      <paper-button id="saveButton" raised>guardar</paper-button>
      
@@ -65,10 +72,11 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
           type:Object,
           value:function(){
             return{
-              lugar:'',
+          
               identificador:'',
               fecha:new Date().toLocaleString(),
-              descripcion:''
+              descripcion:'',
+              address:''
             }
           }
           
@@ -80,24 +88,22 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
 
       listeners:{
          'saveButton.tap': 'save',
-       //  'positive-toast': 'positiveFeedback'
-         
      },
- 
 
       // método para guardar los datos de la denuncia en Firebase
       save:function(){
-     
-        if(this.complaint.identificador && this.complaint.lugar && this.complaint.descripcion){
+   
+        if(this.complaint.identificador && this.complaint.address && this.complaint.descripcion){
           // sube los datos de la denuncia a Firebase
           this.$.query.ref.push(this.complaint);
           this.fire('positive-toast', 'denúncia guardada')
           // después de introducir los valores en los input se limpia el texto
           this.complaint= {
-            lugar:'',
+           
             identificador:'',
             descripcion:'',
-            fecha:''
+            fecha:'',
+            address:''
           };
           
         }else{
