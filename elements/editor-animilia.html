@@ -1,19 +1,16 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../polymerfire/firebase-app.html">
-<link rel="import" href="../polymerfire/firebase-auth.html">
-<link rel="import" href="../polymerfire/firebase-document.html">
-<link rel="import" href="../polymerfire/firebase-query.html">
-<link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../paper-toast/paper-toast.html">
-<link rel="import" href="/toast-behavior.html">
-<link rel="import" href="/input-behavior.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../behaviors/toast-behavior.html">
+<link rel="import" href="../behaviors/input-behavior.html">
 
 <!-- componente <complaint-animilia> -->
-<link rel="import" href="/complaint-animilia.html">
+<link rel="import" href="complaint-animilia.html">
 
 <!-- imports que corresponden al componente <complaint-animilia> -->
-<link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
 
 <!--
 `editor-animilia`
@@ -29,27 +26,13 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
         display: block;
       }
     </style>
-    
-     <firebase-app 
-            auth-domain="form-polymerfire.firebaseapp.com"
-            database-url="https://form-polymerfire.firebaseio.com"
-            api-key="AIzaSyCqn8S15HxxOj3-racdBVhRozgeFUYdFww"
-            name="form-polymerfire">
-    </firebase-app>
 
-<!-- sistema de login -->
-    <firebase-auth 
+      <firebase-auth 
             app-name="form-polymerfire"
             id="auth" 
-            user="{{user}}" 
-            provider="google" 
-            on-error="handleError"
-            signed-in="{{logueado}}">
+            user="{{user}}">
     </firebase-auth>
-
-    <paper-button raised on-tap="login" hidden$="{{logueado}}">login</paper-button>
-    <paper-button raised on-tap="logout" hidden$="{{!logueado}}">logout</paper-button>
-
+    
     <complaint-animilia
           lugar="{{complaint.lugar}}"
           identificador="{{complaint.identificador}}"     
@@ -65,7 +48,7 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
             path="/denuncias/[[user.uid]]">
         </firebase-query>
 
-<paper-toast id="positiveToast"></paper-toast>
+
 
   </template>
 
@@ -93,38 +76,14 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
        
       },
 
-      behaviors: [Polymer.inputBehavior, Polymer.toastBehavior],
+      behaviors: [Polymer.inputBehavior],
 
       listeners:{
          'saveButton.tap': 'save',
-         'positive-toast': 'positiveFeedback'
+       //  'positive-toast': 'positiveFeedback'
          
      },
-//////////////////  SISTEMA DE LOGIN //////////////////
-     login:function(){
-        this.$.auth.signInWithPopup().then(function(response){
-          this.saveProfile(response.user)
-        }.bind(this))
-
-      },
-
-      saveProfile:function(user){
-          console.log(user);
-          this.fbapp.database().ref('/usuarios/' + user.uid).set({
-                  nombre: user.displayName,
-                  email: user.email
-
-          })
-      },
-
-      logout:function(){
-        this.$.auth.signOut().
-        then(function(){
-          console.log('usuario deslogado')
-        })
-      },
-
-   /////////////////////////////////////////////////////////////////////////////////   
+ 
 
       // método para guardar los datos de la denuncia en Firebase
       save:function(){
@@ -134,7 +93,12 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
           this.$.query.ref.push(this.complaint);
           this.fire('positive-toast', 'denúncia guardada')
           // después de introducir los valores en los input se limpia el texto
-          this.complaint= null;
+          this.complaint= {
+            lugar:'',
+            identificador:'',
+            descripcion:'',
+            fecha:''
+          };
           
         }else{
           // al clickar en el botón 'guardar' se lanza el mètodo validator, incluido en el behavior, que valida los inputs

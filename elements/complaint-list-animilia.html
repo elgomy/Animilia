@@ -1,10 +1,7 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-card/paper-card.html">
-<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 
-<link rel="import" href="../polymerfire/polymerfire.html">
-
-<link rel="import" href="/animilia-behavior.html">
 
 
 <!--
@@ -26,24 +23,7 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
       }
     </style>
 
-        <firebase-app 
-            auth-domain="form-polymerfire.firebaseapp.com"
-            database-url="https://form-polymerfire.firebaseio.com"
-            api-key="AIzaSyCqn8S15HxxOj3-racdBVhRozgeFUYdFww"
-            name="form-polymerfire">
-    </firebase-app>
-
-<!-- sistema de login -->
-    <firebase-auth 
-            app-name="form-polymerfire"
-            id="auth" 
-            user="{{user}}" 
-            on-error="handleError"
-            signed-in="{{logueado}}">
-    </firebase-auth>
-
-    <paper-button raised on-tap="login" hidden="{{logueado}}">login</paper-button>
-    <paper-button raised on-tap="logout" hidden="{{!logueado}}">logout</paper-button>
+     
 
 
     <firebase-query
@@ -85,7 +65,7 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
         complaint:Object
       },
 
-      behaviors:[Polymer.animiliaBehavior],
+ 
 
      remove:function(e) {
       

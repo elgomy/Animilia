@@ -9,6 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
@@ -21,6 +22,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="my-icons.html">
+<!--componentes especìficos de Animilia-->
+<link rel="import" href="../elements/animilia-elements.html">
+<link rel="import" href="../behaviors/toast-behavior.html">
 
 <dom-module id="my-app">
   <template>
@@ -58,6 +62,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
+    <!--inicializamos Firebase -->
+         <firebase-app 
+            auth-domain="form-polymerfire.firebaseapp.com"
+            database-url="https://form-polymerfire.firebaseio.com"
+            api-key="AIzaSyCqn8S15HxxOj3-racdBVhRozgeFUYdFww"
+            name="form-polymerfire">
+        </firebase-app>
+
+
+   
+
     <app-location route="{{route}}"></app-location>
     <app-route
         route="{{route}}"
@@ -70,9 +85,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-drawer id="drawer">
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="view1" href="/view1">View One</a>
-          <a name="view2" href="/view2">View Two</a>
-          <a name="view3" href="/view3">View Three</a>
+          <a name="view1" href="/view1">Capa</a>
+          <a name="view2" href="/view2">Denuncia</a>
+          <a name="view3" href="/view3">Lista</a>
         </iron-selector>
       </app-drawer>
 
@@ -82,7 +97,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-header condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>My App</div>
+            <div main-title>Animilia</div>
+             <login-animilia></login-animilia>
           </app-toolbar>
         </app-header>
 
@@ -98,6 +114,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>
+    <paper-toast id="positiveToast"></paper-toast>
   </template>
 
   <script>
@@ -112,6 +129,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
       },
 
+       listeners:{
+         'positive-toast': 'positiveFeedback'
+         },
+
+      behaviors: [Polymer.toastBehavior],
+      
       observers: [
         '_routePageChanged(routeData.page)',
       ],

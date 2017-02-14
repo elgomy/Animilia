@@ -1,0 +1,72 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+
+<dom-module id="login-animilia">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    
+  
+    <!-- sistema de login -->
+    <firebase-auth 
+            app-name="form-polymerfire"
+            id="auth" 
+            user="{{user}}" 
+            provider="google" 
+            on-error="handleError"
+            signed-in="{{logueado}}">
+    </firebase-auth>
+
+    <paper-button raised on-tap="login" hidden$="{{logueado}}">login</paper-button>
+    <paper-button raised on-tap="logout" hidden$="{{!logueado}}">logout</paper-button>
+
+
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'login-animilia',
+
+      properties: {
+         user:Object,
+         logueado: Boolean,
+       
+       
+      },
+
+
+//////////////////  SISTEMA DE LOGIN //////////////////
+     login:function(){
+        this.$.auth.signInWithPopup().then(function(response){
+          this.saveProfile(response.user)
+        }.bind(this))
+
+      },
+
+      saveProfile:function(user){
+          console.log(user);
+          this.fbapp.database().ref('/usuarios/' + user.uid).set({
+                  nombre: user.displayName,
+                  email: user.email
+
+          })
+      },
+
+      logout:function(){
+        this.$.auth.signOut().
+        then(function(){
+          console.log('usuario deslogado')
+        })
+      },
+
+  
+
+    });
+  </script>
+</dom-module>
