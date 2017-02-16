@@ -4,12 +4,22 @@
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../behaviors/toast-behavior.html">
 <link rel="import" href="../behaviors/input-behavior.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+
+
 
 
 <!-- componente <complaint-animilia> -->
 <link rel="import" href="complaint-animilia.html">
 <!-- componente <current-location.html> -->
 <link rel="import" href="current-location.html">
+<!-- componente <location-search-animilia.html> -->
+<link rel="import" href="location-search-animilia.html">
+
 
 <!-- imports que corresponden al componente <complaint-animilia> -->
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
@@ -43,18 +53,41 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
           inputs="{{inputs}}"
     ></complaint-animilia>
 
+<paper-tabs selected="{{selected}}">
+  <paper-tab>Meu endereço atual</paper-tab>
+  <paper-tab>Procurar endereço</paper-tab>
+ 
+</paper-tabs>
+
+    <iron-pages selected="{{selected}}">
+  <div>
+      
     <current-location
           address="{{complaint.address}}">
     </current-location>
 
-     <paper-button id="saveButton" raised>guardar</paper-button>
+  </div>
+  <div>
+
+  <location-search-animilia>
+    
+  </location-search-animilia>
+
+  
+
+ </div>
+  
+</iron-pages>
+
+
+  <paper-fab icon="done" id="saveButton"></paper-fab>
+   
      
          <firebase-query
             id="query"
             app-name="form-polymerfire"
             path="/denuncias/[[user.uid]]">
         </firebase-query>
-
 
 
   </template>
@@ -71,14 +104,13 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
          complaint:{
           type:Object,
           value:function(){
-            return{
-          
+            return{        
               identificador:'',
               fecha:new Date().toLocaleString(),
               descripcion:'',
               address:''
+              }
             }
-          }
           
          }
        
@@ -88,7 +120,13 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
 
       listeners:{
          'saveButton.tap': 'save',
+         'getplace':'getPlace'
      },
+
+      // método que hace de enlace con el componente <paper-input-place>. Cuando <paper-input-place> selecciona la dirección, se lanza el evento 'getplace' en ese componente, que a su vez lanza el evento 'getPlace' en este componente recibiendo como parámetro la dirección y se setea a la propiedad complaint.address
+      getPlace:function(e,place){
+      this.set('complaint.address',place.formatted_address)
+    },
 
       // método para guardar los datos de la denuncia en Firebase
       save:function(){
@@ -96,15 +134,14 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
         if(this.complaint.identificador && this.complaint.address && this.complaint.descripcion){
           // sube los datos de la denuncia a Firebase
           this.$.query.ref.push(this.complaint);
-          this.fire('positive-toast', 'denúncia guardada')
+          this.fire('positive-toast', 'denúncia guardada');
           // después de introducir los valores en los input se limpia el texto
-          this.complaint= {
-           
-            identificador:'',
-            descripcion:'',
-            fecha:'',
-            address:''
-          };
+          this.complaint= {         
+                identificador:'',
+                descripcion:'',
+                fecha:new Date().toLocaleString(),
+                address:''
+            };
           
         }else{
           // al clickar en el botón 'guardar' se lanza el mètodo validator, incluido en el behavior, que valida los inputs
@@ -112,8 +149,7 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
               this.validator(this.inputs[i])
            };
 
-        };          
-                 
+        };                          
 
       },
 

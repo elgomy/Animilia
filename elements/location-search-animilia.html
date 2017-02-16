@@ -1,0 +1,52 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-input-place/paper-input-place.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<!--
+`location-search-animilia`
+componente que sirve para que el usuario busque una dirección
+
+@demo demo/index.html 
+-->
+
+<dom-module id="location-search-animilia">
+ <template>
+    <style>
+      :host {
+        display: block;
+      }
+   
+     
+    </style>
+   
+   <paper-input-place 
+        id="inputPlace"
+        place="{{place}}" 
+        api-key="AIzaSyBQmrFhtdagQZRAZps26eOV5qZ5z3wndxA" 
+        label="Procura um endereço"
+        hide-error>
+        
+    </paper-input-place>
+       
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'location-search-animilia',
+
+      properties: {
+        place: {
+          type: Object,
+          notify:true
+          
+        },
+      },
+
+
+
+    });
+  </script>
+</dom-module>

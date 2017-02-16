@@ -26,7 +26,9 @@
     "google-map": "GoogleWebComponents/google-map#^1.2.0",
     "paper-fab": "PolymerElements/paper-fab#^1.2.1",
     "paper-spinner": "PolymerElements/paper-spinner#^1.2.1",
-    "iron-icons": "PolymerElements/iron-icons#^1.2.0"
+    "iron-icons": "PolymerElements/iron-icons#^1.2.0",
+    "paper-tabs": "PolymerElements/paper-tabs#^1.8.0",
+    "paper-input-place": "^1.1.2"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

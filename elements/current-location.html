@@ -5,9 +5,13 @@
 <link rel="import" href="../bower_components/google-map/google-map-marker.html">
 <link rel="import" href="../bower_components/google-map/google-map-search.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+
+
+
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+
+
+
 
 <!--
 `current-location`
@@ -32,16 +36,15 @@ componente para fijar la ubicación actual del usuario con Google Maps
 
       
      <p>Onde?</p>   
-     <paper-spinner active="{{spinnerActivate}}"></paper-spinner>
-     {{address}}  
-      
-
-   
+         
       <google-maps-api 
               api-key="AIzaSyBQmrFhtdagQZRAZps26eOV5qZ5z3wndxA">
       </google-maps-api>  
 
-      <geo-location 
+
+      <paper-spinner active="{{spinnerActivate}}"></paper-spinner>
+     {{address}} 
+       <geo-location 
               latitude="{{lat}}"
               longitude="{{lng}}"
               watch-pos 
@@ -69,8 +72,7 @@ componente para fijar la ubicación actual del usuario con Google Maps
          </google-map-marker> 
 
   </google-map>   
-
-  <paper-fab icon="done" on-tap="confirmLocation"></paper-fab>
+     
 
   </template>
 
