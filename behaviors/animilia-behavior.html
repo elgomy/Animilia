@@ -8,24 +8,27 @@
 
 // con este método excluimos el mensaje de error del método validate(). Se lanza cuando comenzamos a escribir dentro del input (on-keydown)
     validateNull:function(){       
-   
-
-     this.inputs[0].invalid = null; 
-   	this.inputs[1].invalid = null; 
-   	this.inputs[2].invalid = null;    
+        
+      this.inputs[0].invalid = null; 
+   	  this.inputs[1].invalid = null; 
+   	  this.inputs[2].invalid = null;    
      
       },
 
     delete:function(target){
     
-        var key = target.$key;
-        this.$.query.ref.child(key).remove()
+      var key = target.$key;
+      this.$.query.ref.child(key).remove()
       },
 
      edit:function(target){
-      console.log('hola')
-       // var key = target.$key;
-       // this.$.query.ref.child(key).remove()
+      var key = target.$key;
+        this.$.query.ref.child(key).update({
+           identificador: this.complaint.identificador,
+           descripcion: this.complaint.descripcion,
+           fecha: new Date().toLocaleString(),
+           address: this.complaint.address
+        })
       },
 
 

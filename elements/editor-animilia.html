@@ -7,8 +7,7 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+
 
 
 
@@ -16,9 +15,9 @@
 <!-- componente <complaint-animilia> -->
 <link rel="import" href="complaint-animilia.html">
 <!-- componente <current-location.html> -->
-<link rel="import" href="current-location.html">
-<!-- componente <location-search-animilia.html> -->
-<link rel="import" href="location-search-animilia.html">
+
+
+<link rel="import" href="complaint-list-animilia.html">
 
 
 <!-- imports que corresponden al componente <complaint-animilia> -->
@@ -40,54 +39,55 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
       }
     </style>
 
-      <firebase-auth 
+    <firebase-auth 
             app-name="form-polymerfire"
             id="auth" 
             user="{{user}}">
     </firebase-auth>
+
+    <paper-fab icon="add" id="createComplaint"></paper-fab>
+
     
-    <complaint-animilia
-       
-          identificador="{{complaint.identificador}}"     
-          descripcion="{{complaint.descripcion}}"       
-          inputs="{{inputs}}"
-    ></complaint-animilia>
-
-<paper-tabs selected="{{selected}}">
-  <paper-tab>Meu endereço atual</paper-tab>
-  <paper-tab>Procurar endereço</paper-tab>
- 
-</paper-tabs>
-
-    <iron-pages selected="{{selected}}">
-  <div>
-      
-    <current-location
-          address="{{complaint.address}}">
-    </current-location>
-
-  </div>
-  <div>
-
-  <location-search-animilia>
     
-  </location-search-animilia>
-
-  
-
- </div>
-  
-</iron-pages>
+      <complaint-animilia
+          name="create"     
+          complaint="{{complaint}}"     
+          inputs="{{inputs}}">
+        </complaint-animilia>
 
 
-  <paper-fab icon="done" id="saveButton"></paper-fab>
    
-     
+
+    <paper-fab icon="done" id="saveButton"></paper-fab>
+    <paper-button raised on-tap="update">update</paper-button>
+        
          <firebase-query
             id="query"
             app-name="form-polymerfire"
-            path="/denuncias/[[user.uid]]">
+            path="/denuncias/[[user.uid]]"
+            data="{{data}}">
+
         </firebase-query>
+
+    <template name="list" is="dom-repeat" items="[[data]]" as="complaint">  
+  
+      <paper-card 
+            heading="[[complaint.identificador]]" 
+            image="https://t1.ea.ltmcdn.com/es/images/9/7/5/img_nombres_para_perros_originales_y_bonitos_5579_paso_1_600.jpg" 
+            alt="[[complaint.identificador]]">
+          
+            <div class="card-content">
+            [[complaint.descripcion]]
+          </div>
+           <div class="card-actions">
+              <paper-button complaint="[[complaint]]" on-tap="edition">Editar</paper-button>
+              <paper-button complaint="[[complaint]]" on-tap="remove">Deletar</paper-button>
+              <paper-button>Enviar</paper-button>
+          </div>
+     </paper-card>
+
+    </template>   
+
 
 
   </template>
@@ -100,23 +100,18 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
       properties: {
          user:Object,
          logueado: Boolean,
-         // objeto Complaint donde guardaremos todos los datos de la denuncia, que vienen bindeados desde el componente <complaint-animilia>
-         complaint:{
-          type:Object,
-          value:function(){
-            return{        
-              identificador:'',
-              fecha:new Date().toLocaleString(),
-              descripcion:'',
-              address:''
-              }
-            }
-          
-         }
+         data:Array,
+         complaint:Object,
+         section:{
+            type:String,
+            value:'list'
+         },
+        
        
       },
 
-      behaviors: [Polymer.inputBehavior],
+      behaviors: [Polymer.inputBehavior, Polymer.animiliaBehavior],
+
 
       listeners:{
          'saveButton.tap': 'save',
@@ -152,6 +147,38 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
         };                          
 
       },
+
+    createComplaint:function(){
+        this.section = 'create'
+    },
+
+
+    remove:function(e) {   
+      this.delete(e.currentTarget.complaint);   
+     },
+
+    edition:function(e){
+     var key = e.currentTarget.complaint.$key;
+     var fireComplaint = e.currentTarget.complaint;
+    console.log(fireComplaint);
+    console.log(key);
+   //  console.log(this.complaint)
+   
+      this.set('complaint.identificador',fireComplaint.identificador);
+     
+
+    },
+
+       update:function(key){
+     
+        this.$.query.ref.child(key).update({
+           identificador: this.complaint.identificador,
+           descripcion: this.complaint.descripcion,
+           fecha: new Date().toLocaleString(),
+           address: this.complaint.address
+        })
+      },
+    
 
     });
   </script>

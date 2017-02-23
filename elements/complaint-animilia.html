@@ -2,6 +2,13 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-input/paper-textarea.html"> 
 <link rel="import" href="../behaviors/input-behavior.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<!-- componente <current-location.html> -->
+<link rel="import" href="current-location.html">
+<!-- componente <location-search-animilia.html> -->
+<link rel="import" href="location-search-animilia.html">
 
 <!--
 `form-animilia`
@@ -16,8 +23,7 @@ formulario de entrada de denuncias de maltrato animal
       :host {
         display: block;
       }
-    </style>
-    
+    </style>   
   
 <!-- sistema de entrada de datos para generar la denuncia -->
 
@@ -27,21 +33,37 @@ formulario de entrada de denuncias de maltrato animal
           required
           on-keydown="validateNull"
           error-message="necessário incluir um identificador"
-          value="{{identificador}}">          
+          value="{{complaint.identificador}}">          
     </paper-input>
 
- 
-
-    <paper-textarea 
+     <paper-textarea 
           id="textInput" 
           label="Relato do que você presenciou"
           rows="2"
           required   
           on-keydown="validateNull"
           error-message="necessário relatar a denúncia"
-          value="{{descripcion}}">                
+          value="{{complaint.descripcion}}">                
     </paper-textarea>
 
+<!-- geolocalización -->
+
+    <paper-tabs selected="{{selected}}">
+      <paper-tab>Meu endereço atual</paper-tab>
+      <paper-tab>Procurar endereço</paper-tab>
+    </paper-tabs>
+
+    <iron-pages selected="{{selected}}">
+  
+      <div>
+       <current-location address="{{complaint.address}}"></current-location>
+      </div>
+  
+      <div>
+        <location-search-animilia></location-search-animilia>
+      </div>
+  
+    </iron-pages>
 
 
   </template>
@@ -52,28 +74,30 @@ formulario de entrada de denuncias de maltrato animal
       is: 'complaint-animilia',
 
       properties: {
-        
 
-          // identificador de la denuncia que servirá para el usuario identificar sus denuncias. Probablemente excluiremos esta propiedad
-          identificador:{
-            type:String,
-            notify: true,
-            value: ''
-          },
-          // relato de la denuncia
-          descripcion:{
-             type:String,
-            notify: true,
-            value: ''
-          },
+         // objeto Complaint donde guardaremos todos los datos de la denuncia, que vienen bindeados desde el componente <complaint-animilia>
+         complaint:{
+          type:Object,
+          notify:true,
+          value:function(){
+            return{        
+              identificador:'',
+              fecha:new Date().toLocaleString(),
+              descripcion:'',
+              address:''
+              }
+            }
+          
+         },    
+
           // inputs del formulario
-          inputs:{
+         inputs:{
             type:Array,
-            value: function(){
-              return [this.$.idInput,this.$.textInput]
+           value: function(){
+            return [this.$.idInput,this.$.textInput]
             },
             notify: true,
-          }       
+         }       
 
       },
        behaviors: [Polymer.inputBehavior]  

@@ -71,8 +71,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </firebase-app>
 
 
-   
-
     <app-location route="{{route}}"></app-location>
     <app-route
         route="{{route}}"
@@ -86,8 +84,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <a name="view1" href="/view1">Capa</a>
-          <a name="view2" href="/view2">Denuncia</a>
-          <a name="view3" href="/view3">Lista</a>
+          <a name="view2" href="/view2">Denúncias</a>
+          <a name="view3" href="/view3">Parques</a>
         </iron-selector>
       </app-drawer>
 
@@ -115,6 +113,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </app-header-layout>
     </app-drawer-layout>
     <paper-toast id="positiveToast"></paper-toast>
+
   </template>
 
   <script>
@@ -156,6 +155,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _showPage404: function() {
         this.page = 'view404';
       },
+
+    
     });
   </script>
 </dom-module>

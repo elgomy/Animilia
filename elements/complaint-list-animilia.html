@@ -1,7 +1,8 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-
+<link rel="import" href="../behaviors/animilia-behavior.html">
+<link rel="import" href="complaint-animilia.html">
 
 
 <!--
@@ -26,14 +27,8 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
      
 
 
-    <firebase-query
-            id="query"
-            app-name="form-polymerfire"
-            path="/denuncias/dZBSeSvvhdfuTakkXiOcBTCNKt43"
-            data="{{data}}">
-    </firebase-query>
-
-    <template is="dom-repeat" items="[[data]]" as="complaint">         
+    <template is="dom-repeat" items="[[data]]" as="complaint">  
+  
 
     <paper-card 
             heading="[[complaint.identificador]]" 
@@ -51,6 +46,8 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
     </div>
     </paper-card>
 
+   
+
   </template>
 
   </template>
@@ -65,17 +62,9 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
         complaint:Object
       },
 
- 
+     behaviors: [Polymer.animiliaBehavior],
 
-     remove:function(e) {
-      
-      this.delete(e.currentTarget.complaint);
-      
-     },
 
-     edition:function(e){
-      this.edit(e)
-     }
 
       
     
