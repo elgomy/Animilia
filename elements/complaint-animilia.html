@@ -100,7 +100,12 @@ formulario de entrada de denuncias de maltrato animal
          }       
 
       },
-       behaviors: [Polymer.inputBehavior]  
+       behaviors: [Polymer.inputBehavior],
+
+       // método que hace de enlace con el componente <paper-input-place>. Cuando <paper-input-place> selecciona la dirección, se lanza el evento 'getplace' en ese componente, que a su vez lanza el evento 'getPlace' en este componente recibiendo como parámetro la dirección y se setea a la propiedad complaint.address
+      getPlace:function(e,place){
+      this.set('complaint.address',place.formatted_address)
+    },  
 
    
     });

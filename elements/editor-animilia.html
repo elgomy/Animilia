@@ -9,9 +9,6 @@
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 
 
-
-
-
 <!-- componente <complaint-animilia> -->
 <link rel="import" href="complaint-animilia.html">
 <!-- componente <current-location.html> -->
@@ -47,19 +44,25 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
 
     <paper-fab icon="add" id="createComplaint"></paper-fab>
 
-    
-    
+    <iron-pages selected="{{section}}" attr-for-selected="name">
+      
+       <div name="create">
+ 
       <complaint-animilia
-          name="create"     
+              
           complaint="{{complaint}}"     
           inputs="{{inputs}}">
         </complaint-animilia>
-
-
-   
+ 
 
     <paper-fab icon="done" id="saveButton"></paper-fab>
     <paper-button raised on-tap="update">update</paper-button>
+
+    </div>
+
+    <div name="list">
+
+    
         
          <firebase-query
             id="query"
@@ -88,7 +91,9 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
 
     </template>   
 
+    </div>
 
+   </iron-pages>
 
   </template>
 
@@ -105,9 +110,7 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
          section:{
             type:String,
             value:'list'
-         },
-        
-       
+         },     
       },
 
       behaviors: [Polymer.inputBehavior, Polymer.animiliaBehavior],
@@ -115,41 +118,49 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
 
       listeners:{
          'saveButton.tap': 'save',
-         'getplace':'getPlace'
+         'getplace':'getPlace',
+         'createComplaint.tap': 'create' 
      },
-
-      // método que hace de enlace con el componente <paper-input-place>. Cuando <paper-input-place> selecciona la dirección, se lanza el evento 'getplace' en ese componente, que a su vez lanza el evento 'getPlace' en este componente recibiendo como parámetro la dirección y se setea a la propiedad complaint.address
-      getPlace:function(e,place){
-      this.set('complaint.address',place.formatted_address)
-    },
+  
 
       // método para guardar los datos de la denuncia en Firebase
       save:function(){
+
+        if(!this.user){
+          this.fire('negative-toast', 'você deve estar autenticado');
+          return false;
+        }
    
-        if(this.complaint.identificador && this.complaint.address && this.complaint.descripcion){
+        if(this.complaint.identificador && this.complaint.descripcion && this.complaint.address){
           // sube los datos de la denuncia a Firebase
-          this.$.query.ref.push(this.complaint);
-          this.fire('positive-toast', 'denúncia guardada');
-          // después de introducir los valores en los input se limpia el texto
-          this.complaint= {         
-                identificador:'',
-                descripcion:'',
-                fecha:new Date().toLocaleString(),
-                address:''
-            };
-          
-        }else{
+          this.$.query.ref.push(this.complaint)
+            .then(function(){
+              this.fire('positive-toast', 'denúncia guardada');
+          // después de introducir los valores en los input se limpia el texto. Fijamos tanto la fecha como la dirección, ya que si los limpiamos el sistema no genera de nuevo esos valores. Behavior 'animilia-behavior'
+              this.resetComplaint();
+           // una vez guardada la denuncia, volvemos a mostrar el listado de denuncias 
+              this.backList();
+
+              }.bind(this))
+            .catch(function(error){
+              this.fire('negative-toast', 'error: ' + error);
+          });  
+                        
+        } else {
           // al clickar en el botón 'guardar' se lanza el mètodo validator, incluido en el behavior, que valida los inputs
           for(var i = 0; i < this.inputs.length; i++ ){
               this.validator(this.inputs[i])
-           };
-
+           };           
         };                          
-
       },
 
-    createComplaint:function(){
-        this.section = 'create'
+    create:function(){
+        this.section = 'create';
+       
+    },
+
+    backList:function(){
+      this.section = 'list'
     },
 
 

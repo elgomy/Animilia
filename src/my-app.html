@@ -113,6 +113,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </app-header-layout>
     </app-drawer-layout>
     <paper-toast id="positiveToast"></paper-toast>
+    <paper-toast id="negativeToast"></paper-toast>
 
   </template>
 
@@ -129,7 +130,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
        listeners:{
-         'positive-toast': 'positiveFeedback'
+         'positive-toast': 'positiveFeedback',
+         'negative-toast': 'negativeFeedback'
          },
 
       behaviors: [Polymer.toastBehavior],

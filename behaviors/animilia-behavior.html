@@ -15,6 +15,16 @@
      
       },
 
+    resetComplaint:function(){
+        this.complaint= {         
+                identificador:'',
+                descripcion:'',
+                fecha:new Date().toLocaleString(),
+                address:this.complaint.address
+               
+            }
+    },
+
     delete:function(target){
     
       var key = target.$key;
