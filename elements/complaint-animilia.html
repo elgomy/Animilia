@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../bower_components/paper-input/paper-textarea.html"> 
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../behaviors/input-behavior.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
@@ -56,15 +57,14 @@ formulario de entrada de denuncias de maltrato animal
     <iron-pages selected="{{selected}}">
   
       <div>
-       <current-location address="{{complaint.address}}"></current-location>
+        <current-location address="{{complaint.address}}"></current-location>
       </div>
   
       <div>
-        <location-search-animilia></location-search-animilia>
+        <location-search-animilia place="{{complaint.address}}"></location-search-animilia>
       </div>
   
     </iron-pages>
-
 
   </template>
 
@@ -86,26 +86,35 @@ formulario de entrada de denuncias de maltrato animal
               descripcion:'',
               address:''
               }
-            }
-          
+            }      
          },    
 
           // inputs del formulario
          inputs:{
             type:Array,
-           value: function(){
-            return [this.$.idInput,this.$.textInput]
+            value: function(){
+              return [this.$.idInput,this.$.textInput]
             },
             notify: true,
          }       
-
       },
+
        behaviors: [Polymer.inputBehavior],
+
+       listeners:{
+          'getplace':'getPlace',
+          'setCurrentLocation': 'setAddress',
+       },
 
        // método que hace de enlace con el componente <paper-input-place>. Cuando <paper-input-place> selecciona la dirección, se lanza el evento 'getplace' en ese componente, que a su vez lanza el evento 'getPlace' en este componente recibiendo como parámetro la dirección y se setea a la propiedad complaint.address
       getPlace:function(e,place){
-      this.set('complaint.address',place.formatted_address)
-    },  
+        this.set('complaint.address',place.formatted_address);
+      }, 
+
+       // método que hace de enlace con el componente <current-location>.
+      setAddress: function(e,place){
+        this.set('complaint.address', place);    
+      }
 
    
     });

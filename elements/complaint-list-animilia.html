@@ -64,7 +64,19 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
 
      behaviors: [Polymer.animiliaBehavior],
 
+     remove:function(e) {   
+      
+      var complaintItem = e.currentTarget.complaint;
+      this.fire('delete', complaintItem) 
+    
+     },
 
+      edition:function(e) {   
+       
+      var complaintItem = e.currentTarget.complaint;
+      this.fire('edition', complaintItem) 
+    
+     },
 
       
     

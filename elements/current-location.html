@@ -5,13 +5,7 @@
 <link rel="import" href="../bower_components/google-map/google-map-marker.html">
 <link rel="import" href="../bower_components/google-map/google-map-search.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-
-
-
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
-
-
-
 
 <!--
 `current-location`
@@ -44,10 +38,10 @@ componente para fijar la ubicación actual del usuario con Google Maps
 
       <paper-spinner active="{{spinnerActivate}}"></paper-spinner>
      {{address}} 
+
        <geo-location 
               latitude="{{lat}}"
               longitude="{{lng}}"
-              watch-pos 
               high-accuracy
               on-geo-error="geoError"
               on-geo-response="locationLoad">
@@ -87,14 +81,11 @@ componente para fijar la ubicación actual del usuario con Google Maps
         lat:{
           type:Number,
           notify:true
-          
-         // observer: "latChange"
         },
 
         lng:{
           type:Number,
-          notify:true
-          
+          notify:true     
         },
         // activa el <paper-spinner> hasta que el componente <geo-location> devuelva a dirección del usuario
         spinnerActivate:{
@@ -105,15 +96,13 @@ componente para fijar la ubicación actual del usuario con Google Maps
         // propiedad donde almacenaremos la dirección devuelta por el componente <geo-location> en formato legible
         address:{
           type:String,
-          notify:true
-        
+          notify:true        
         }
         
       },
 
-
       geoError:function(){
-        console.log('Oops!! parece que houve um erro')
+        this.fire('negative-toast', 'Oops!! parece que houve um erro com o mapa')     
       },
 
       locationLoad: function() {
@@ -122,18 +111,10 @@ componente para fijar la ubicación actual del usuario con Google Maps
           var geocoder = new window.google.maps.Geocoder; // -19.928246399999985, -43.96192849999999
           geocoder.geocode({'location':latlng}, function(results){
             var geoAddress = results[0].formatted_address;
-            console.log(geoAddress);
-            this.set('address',geoAddress);
-            this.set('spinnerActivate', false)
-            
-          }.bind(this))
-         
-    },
-
-    confirmLocation:function(){
-      console.log(this.address)
-    }
-     
+            this.fire('setCurrentLocation', geoAddress);   
+            this.set('spinnerActivate', false);                     
+          }.bind(this))       
+      },
 
     });
   </script>

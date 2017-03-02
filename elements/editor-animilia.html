@@ -8,18 +8,10 @@
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 
-
-<!-- componente <complaint-animilia> -->
+<!-- componentes complaint -->
 <link rel="import" href="complaint-animilia.html">
-<!-- componente <current-location.html> -->
-
-
+<link rel="import" href="complaint-edit.html">
 <link rel="import" href="complaint-list-animilia.html">
-
-
-<!-- imports que corresponden al componente <complaint-animilia> -->
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
 
 <!--
 `editor-animilia`
@@ -42,57 +34,36 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
             user="{{user}}">
     </firebase-auth>
 
-    <paper-fab icon="add" id="createComplaint"></paper-fab>
-
-    <iron-pages selected="{{section}}" attr-for-selected="name">
-      
-       <div name="create">
- 
-      <complaint-animilia
-              
-          complaint="{{complaint}}"     
-          inputs="{{inputs}}">
-        </complaint-animilia>
- 
-
-    <paper-fab icon="done" id="saveButton"></paper-fab>
-    <paper-button raised on-tap="update">update</paper-button>
-
-    </div>
-
-    <div name="list">
-
-    
-        
-         <firebase-query
+    <firebase-query
             id="query"
             app-name="form-polymerfire"
             path="/denuncias/[[user.uid]]"
             data="{{data}}">
+    </firebase-query>
 
-        </firebase-query>
+    <paper-fab icon="add" id="createComplaint"></paper-fab>
 
-    <template name="list" is="dom-repeat" items="[[data]]" as="complaint">  
-  
-      <paper-card 
-            heading="[[complaint.identificador]]" 
-            image="https://t1.ea.ltmcdn.com/es/images/9/7/5/img_nombres_para_perros_originales_y_bonitos_5579_paso_1_600.jpg" 
-            alt="[[complaint.identificador]]">
+    <iron-pages selected="{{section}}" attr-for-selected="name">
+
+      <!-- creación de denuncias -->
+      
+       <div name="create">
+          <complaint-animilia complaint="{{complaint}}" inputs="{{inputs}}"></complaint-animilia>
+          <paper-fab icon="done" id="saveButton"></paper-fab>  
+       </div>
+
+       <!-- lista de denuncias -->
+
+      <div name="list">
+          <complaint-list-animilia data="{{data}}" complaint="{{complaint}}"></complaint-list-animilia> 
+      </div>
+
+      <!-- editor de denuncias -->
+
+      <div name="editor">
+          <complaint-edit id="editor"></complaint-edit>  
+      </div>
           
-            <div class="card-content">
-            [[complaint.descripcion]]
-          </div>
-           <div class="card-actions">
-              <paper-button complaint="[[complaint]]" on-tap="edition">Editar</paper-button>
-              <paper-button complaint="[[complaint]]" on-tap="remove">Deletar</paper-button>
-              <paper-button>Enviar</paper-button>
-          </div>
-     </paper-card>
-
-    </template>   
-
-    </div>
-
    </iron-pages>
 
   </template>
@@ -115,14 +86,13 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
 
       behaviors: [Polymer.inputBehavior, Polymer.animiliaBehavior],
 
-
       listeners:{
-         'saveButton.tap': 'save',
-         'getplace':'getPlace',
-         'createComplaint.tap': 'create' 
+         'saveButton.tap': 'save',    
+         'createComplaint.tap': 'create',
+         'delete': 'removeComplaint',
+         'edition': 'editComplaint'
      },
   
-
       // método para guardar los datos de la denuncia en Firebase
       save:function(){
 
@@ -135,16 +105,15 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
           // sube los datos de la denuncia a Firebase
           this.$.query.ref.push(this.complaint)
             .then(function(){
-              this.fire('positive-toast', 'denúncia guardada');
-          // después de introducir los valores en los input se limpia el texto. Fijamos tanto la fecha como la dirección, ya que si los limpiamos el sistema no genera de nuevo esos valores. Behavior 'animilia-behavior'
-              this.resetComplaint();
-           // una vez guardada la denuncia, volvemos a mostrar el listado de denuncias 
-              this.backList();
-
+                this.fire('positive-toast', 'denúncia guardada');
+                    // después de introducir los valores en los input se limpia el texto. Fijamos tanto la fecha como la dirección, ya que si los limpiamos el sistema no genera de nuevo esos valores. Behavior 'animilia-behavior'
+                this.resetComplaint();
+                   // una vez guardada la denuncia, volvemos a mostrar el listado de denuncias 
+                this.backList();
               }.bind(this))
             .catch(function(error){
-              this.fire('negative-toast', 'error: ' + error);
-          });  
+                this.fire('negative-toast', 'error: ' + error);
+            }.bind(this));  
                         
         } else {
           // al clickar en el botón 'guardar' se lanza el mètodo validator, incluido en el behavior, que valida los inputs
@@ -155,40 +124,24 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
       },
 
     create:function(){
-        this.section = 'create';
-       
+      this.section = 'create';     
     },
 
     backList:function(){
       this.section = 'list'
     },
 
-
-    remove:function(e) {   
-      this.delete(e.currentTarget.complaint);   
-     },
-
-    edition:function(e){
-     var key = e.currentTarget.complaint.$key;
-     var fireComplaint = e.currentTarget.complaint;
-    console.log(fireComplaint);
-    console.log(key);
-   //  console.log(this.complaint)
-   
-      this.set('complaint.identificador',fireComplaint.identificador);
-     
-
+    // borrado de la denuncia clickada en la lista. Enlace con el componente <complaint-list-animilia>
+    removeComplaint:function(e,complaintItem){
+      this.$.query.ref.child(complaintItem.$key).remove()
     },
 
-       update:function(key){
-     
-        this.$.query.ref.child(key).update({
-           identificador: this.complaint.identificador,
-           descripcion: this.complaint.descripcion,
-           fecha: new Date().toLocaleString(),
-           address: this.complaint.address
-        })
-      },
+     // edición de la denuncia clickada en la lista. Enlace del componente <complaint-list-animilia> con el componente <complaint-edit>. Recibimos el objeto de la denuncia 'complaintItem' desde el componente <complaint-list-animilia> y se lo inyectamos a la propiedad 'item' del componente <complaint-edit>, para que podamos editar la denuncia. Tambièn le pasamos el path de la denuncia a travès de la propiedad 'path', de manera que podamos hacer el update a dicho path.
+    editComplaint:function(e,complaintItem){
+      this.section = 'editor';
+      this.$.editor.item = complaintItem;
+      this.$.editor.path = this.$.query.ref.child(complaintItem.$key);          
+    },
     
 
     });
