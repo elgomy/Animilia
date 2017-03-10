@@ -90,7 +90,8 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
          'saveButton.tap': 'save',    
          'createComplaint.tap': 'create',
          'delete': 'removeComplaint',
-         'edition': 'editComplaint'
+         'edition': 'editComplaint',
+         'send': 'sendComplaint'
      },
   
       // método para guardar los datos de la denuncia en Firebase
@@ -142,6 +143,12 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
       this.$.editor.item = complaintItem;
       this.$.editor.path = this.$.query.ref.child(complaintItem.$key);          
     },
+    // envio de la denuncia por email. El usuario tiene que tener un gestor de correo, sino no funciona. Como alternativa podemos elaborar codigo en NodeJS
+    sendComplaint:function(e,complaintItem){
+      window.location.href = "mailto:mail@example.org"
+                          +"?subject="+"test"
+                          +"&body="+complaintItem.descripcion
+    }
     
 
     });

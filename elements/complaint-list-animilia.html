@@ -24,11 +24,7 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
       }
     </style>
 
-     
-
-
-    <template is="dom-repeat" items="[[data]]" as="complaint">  
-  
+    <template is="dom-repeat" items="[[data]]" as="complaint">    
 
     <paper-card 
             heading="[[complaint.identificador]]" 
@@ -42,11 +38,9 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
     <div class="card-actions">
         <paper-button complaint="[[complaint]]" on-tap="edition">Editar</paper-button>
         <paper-button complaint="[[complaint]]" on-tap="remove">Deletar</paper-button>
-        <paper-button>Enviar</paper-button>
+        <paper-button complaint="[[complaint]]" on-tap="send">Enviar</paper-button>
     </div>
-    </paper-card>
-
-   
+    </paper-card>  
 
   </template>
 
@@ -62,23 +56,22 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
         complaint:Object
       },
 
-     behaviors: [Polymer.animiliaBehavior],
+      behaviors: [Polymer.animiliaBehavior],
 
-     remove:function(e) {   
-      
-      var complaintItem = e.currentTarget.complaint;
-      this.fire('delete', complaintItem) 
-    
-     },
+      remove:function(e) {   
+        var complaintItem = e.currentTarget.complaint;
+        this.fire('delete', complaintItem) 
+      },
 
-      edition:function(e) {   
-       
-      var complaintItem = e.currentTarget.complaint;
-      this.fire('edition', complaintItem) 
-    
-     },
+      edition:function(e) {    
+        var complaintItem = e.currentTarget.complaint;
+        this.fire('edition', complaintItem) 
+      },
 
-      
+      send:function(e) {    
+        var complaintItem = e.currentTarget.complaint;
+        this.fire('send', complaintItem) 
+      },     
     
 
     });
