@@ -20,11 +20,11 @@ formulario de entrada de denuncias de maltrato animal
         display: block;
       }
     </style>   
-  
+
+<iron-icon icon="clear" id="clearIcon"></iron-icon>  
 <complaint-animilia complaint="{{item}}"></complaint-animilia>
 
 <paper-fab icon="done" id="saveButton"></paper-fab>
-
 
   </template>
 
@@ -44,8 +44,8 @@ formulario de entrada de denuncias de maltrato animal
 
           listeners:{
          'saveButton.tap': 'save',
+         'clearIcon.tap': 'close'
         },
-
 
         // método para guardar los datos de la denuncia en Firebase
       save:function(){
@@ -58,12 +58,16 @@ formulario de entrada de denuncias de maltrato animal
           this.path.update(itemUpdate)
               .then(function(){
                 this.fire('positive-toast', 'denúncia editada');
+                this.close();
               }.bind(this))
               .catch(function(error){
               this.fire('negative-toast', 'error: ' + error);
             }.bind(this));
+          },
 
-      }
+      close:function(){
+        this.fire('closeEditor')
+      },
 
    
     });

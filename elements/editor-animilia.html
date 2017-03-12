@@ -5,8 +5,10 @@
 <link rel="import" href="../behaviors/toast-behavior.html">
 <link rel="import" href="../behaviors/input-behavior.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
 
 <!-- componentes complaint -->
 <link rel="import" href="complaint-animilia.html">
@@ -25,7 +27,9 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
     <style>
       :host {
         display: block;
+
       }
+    
     </style>
 
     <firebase-auth 
@@ -41,13 +45,14 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
             data="{{data}}">
     </firebase-query>
 
-    <paper-fab icon="add" id="createComplaint"></paper-fab>
-
+    <iron-signals on-iron-signal-delete="removeItem"></iron-signals>
+     
     <iron-pages selected="{{section}}" attr-for-selected="name">
 
       <!-- creación de denuncias -->
       
        <div name="create">
+       <iron-icon icon="clear" id="clearIcon"></iron-icon>
           <complaint-animilia complaint="{{complaint}}" inputs="{{inputs}}"></complaint-animilia>
           <paper-fab icon="done" id="saveButton"></paper-fab>  
        </div>
@@ -55,7 +60,8 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
        <!-- lista de denuncias -->
 
       <div name="list">
-          <complaint-list-animilia data="{{data}}" complaint="{{complaint}}"></complaint-list-animilia> 
+      <paper-fab icon="add" id="createComplaint"></paper-fab>
+          <complaint-list-animilia data="{{data}}" complaint="{{complaint}}"></complaint-list-animilia>  
       </div>
 
       <!-- editor de denuncias -->
@@ -89,9 +95,11 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
       listeners:{
          'saveButton.tap': 'save',    
          'createComplaint.tap': 'create',
-         'delete': 'removeComplaint',
+         'deleteComplaint': 'removeItem',
          'edition': 'editComplaint',
-         'send': 'sendComplaint'
+         'send': 'sendComplaint',
+         'closeEditor':'backList',
+         'clearIcon.tap': 'backList'
      },
   
       // método para guardar los datos de la denuncia en Firebase
@@ -132,9 +140,15 @@ editor con el que vamos poder guardar las denuncias, editarlas, etc
       this.section = 'list'
     },
 
+  //  removeComplaint:function(){
+  //    this.$.dialog.open()
+
+  //  },
+
     // borrado de la denuncia clickada en la lista. Enlace con el componente <complaint-list-animilia>
-    removeComplaint:function(e,complaintItem){
-      this.$.query.ref.child(complaintItem.$key).remove()
+    removeItem:function(e,complaintItem){
+     this.$.query.ref.child(complaintItem.$key).remove();
+     
     },
 
      // edición de la denuncia clickada en la lista. Enlace del componente <complaint-list-animilia> con el componente <complaint-edit>. Recibimos el objeto de la denuncia 'complaintItem' desde el componente <complaint-list-animilia> y se lo inyectamos a la propiedad 'item' del componente <complaint-edit>, para que podamos editar la denuncia. Tambièn le pasamos el path de la denuncia a travès de la propiedad 'path', de manera que podamos hacer el update a dicho path.

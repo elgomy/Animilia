@@ -58,6 +58,7 @@ lista de denuncias creadas en Animilia y almacenadas en Firebase
 
       behaviors: [Polymer.animiliaBehavior],
 
+       // el evento 'delete' se recibe en el componente <my-app> para poder abrir el 'dialog' 
       remove:function(e) {   
         var complaintItem = e.currentTarget.complaint;
         this.fire('delete', complaintItem) 
