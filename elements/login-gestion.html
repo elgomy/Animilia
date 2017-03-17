@@ -1,0 +1,216 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<!-- iron elements-->
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<!-- paper elements-->
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<!-- login elements-->
+<link rel="import" href="login-signin.html">
+<link rel="import" href="login-register.html">
+<!-- behaviors-->
+<link rel="import" href="../behaviors/login-error-behavior.html">
+
+
+<!--
+`login-gestion`
+elemento que nos permite hacer la gestion de los usuarios (login y cadastro) a través de Firebase
+
+@demo demo/index.html 
+-->
+
+<dom-module id="login-gestion">
+  <template>
+    <style>
+      :host {
+         @apply(--layout-vertical);
+
+        margin:auto;
+         width: 400px;
+
+      }    
+    </style>
+
+    <firebase-auth app-name="form-polymerfire"
+                   id="auth" 
+                   user="{{user}}" 
+                   signed-in="{{signed}}"
+                   status-known="{{statusKnown}}">
+    </firebase-auth>
+
+    <iron-signals on-iron-signal-logout="logout"></iron-signals>
+
+    <template is="dom-if" if="[[user]]">
+
+        <firebase-document
+                
+                app-name="form-polymerfire"
+                path="/users/{{user.uid}}" 
+                data="{{perfilUsuario}}">
+       </firebase-document>
+              
+              
+              Usuario: {{perfilUsuario.nombre}}
+     
+    </template>
+
+     
+      
+
+  
+    <paper-tabs selected="{{signSect}}" attr-for-selected="name">
+      <paper-tab name="signin">Entrar</paper-tab>
+      <paper-tab name="register">Cadastre-se</paper-tab>
+    </paper-tabs>
+   
+     <iron-pages selected="{{signSect}}" attr-for-selected="name">
+            
+        <div name="signin">
+          <login-signin 
+              on-sign-google="link"
+              on-sign-facebook="link" 
+              on-sign-email="email"
+              signed-in="[[signed]]">
+          </login-signin>
+           <paper-button raised on-tap="linkEmail">linkEmail</paper-button>
+     
+     <p><a href="#" on-click="sendEmailPass">Esqueci minha senha</a>
+        </div></p>
+
+        <div name="register">
+          <login-register 
+              on-register="signUp" 
+              signed-in="[[signed]]">
+          </login-register>
+        </div>
+   
+</iron-pages>
+          
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'login-gestion',
+
+      properties:{
+          //propiedad bindeada al componente <firebase-auth> y que recibe seteada desde el componente <login-signin> los valores 'google', 'facebook' o twitter para loguearnos con una de estas redes
+          provider:String,
+
+          //objeto del usuario
+          user:Object,        
+
+          // propiedad bindeada que hace el enlace con la propiedad SignedIn de <firebase-auth> que nos devuelve 'true' cuando el usuario esté autenticado.
+          signed: {
+              type: Boolean,
+              reflectToAttribute: true,
+              value: false
+            },
+
+          signSect: {
+              type:String,
+              value: 'signin'
+          },
+          // objeto que nos da acceso a la base de datos de Firebase, y a travès de este objeto, tendremos acceso a los servicios de Firebase: -firebase.auth(); -firebase.database(); -firebase.storage(). IMPORTANTE: quando tengamos problemas de acceso a estos servicios de Firebase a través de Polymerfire podremos acceder a través de este objeto
+          fbapp:Object,
+        
+          statusKnown: Boolean,
+
+          //objeto que nos devuelve <firebase-document> con los datos del usuario
+          perfilUsuario: Object
+         },
+
+          observers:['autoAuth(user, statusKnown)'],
+
+          listeners:{
+            'feedback-positivo': 'feedbackPositivo',
+            'feedback-negativo': 'feedbackNegativo',
+
+         },
+
+         behaviors:[Polymer.loginError],
+
+      // Observer que autentica al usuario de manera anónima si éste aún no existe y si podemos determinar si está logueado (statusKnown)
+      autoAuth: function(user, statusKnown){
+        if(statusKnown && !user){
+         this.$.auth.signInAnonymously().then(function(result){
+          console.log(result)
+         });        
+       }
+      },
+
+      // recibe como parámetro 'social' el dato recibido desde el componente <login-signin> al lanzar el evento. 'social' puede tener el valor 'google', 'facebook' o 'twitter' 
+      link: function(e,social){
+     //   let google = new firebase.auth.GoogleAuthProvider();
+        this.user.linkWithPopup(social).then(function(result){
+            console.log('usuario linkado', result.user.providerData[0]);
+            console.log(result.user);
+            this.saveProfile(result.user);
+        }.bind(this),
+          function(error){
+            this.errorCode(error); // behavior 'loginError'                          
+        }.bind(this));  
+      },
+
+      linkEmail:function(e,user){
+         this.user.link(firebase.auth.EmailAuthProvider.credential(this.user.email, 'password'));
+         console.log(user)
+      },       
+      
+      //método para crear un usuario con email y password. Estos dos datos serán propiedades del objeto 'data'
+      signUp:function(e,data){
+        this.$.auth.createUserWithEmailAndPassword(data.email, data.password).catch(function(error){
+             this.errorCode(error); // behavior 'loginError'  
+        }.bind(this)).then(function(result){
+          this.saveProfile(result);
+          console.log('usuario registrado')
+        }.bind(this));
+      },
+
+        // método que envía un email al usuario para resetear el password
+        sendEmailPass:function(user){
+          this.fbapp.auth().sendPasswordResetEmail(this.user.email).then(function() {
+            console.log('email enviado')
+        }, function(error) {
+            console.log(error)
+          });
+
+      },
+           
+      //login con email y password; 'dato' es el objeto pasado por el componente <login-signin>, que incluye las propiedades 'dato.email' y 'dato.password'
+      email:function(e,dato){   
+        this.$.auth.signInWithEmailAndPassword(dato.email, dato.password)
+          .catch(function(error){
+         // console.log(error.code, error.message);
+             this.errorCode(error); // behavior 'loginError'    
+        }.bind(this))
+          .then(function(result){
+            this.saveProfile(result.user);
+        }.bind(this));
+      },
+
+      // método para guardar los datos del usuario en Firebase. Le pasamos como parámetro a través de 'user' 
+      saveProfile: function (user){
+        this.fbapp.database().ref('/users/' + user.uid).set({
+          nombre: user.providerData[0].displayName,
+          email: user.email,
+          photoURL: user.providerData[0].photoURL
+        })
+      },
+
+      // cerrar sesión de usuario
+      logout:function(){
+        this.$.auth.signOut().catch(function(error){
+          console.log(error.code, error.message)
+        }).then(function(){
+          this.fire('positive-toast','has cerrado la sesión')
+        }.bind(this))
+      },
+
+
+    });
+  </script>
+</dom-module>

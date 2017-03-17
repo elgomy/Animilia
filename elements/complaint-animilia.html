@@ -51,18 +51,18 @@ formulario de entrada de denuncias de maltrato animal
 
 <!-- geolocalización -->
 
-    <paper-tabs selected="{{selected}}">
-      <paper-tab>Meu endereço atual</paper-tab>
-      <paper-tab>Procurar endereço</paper-tab>
+    <paper-tabs selected="{{locationSect}}" attr-for-selected="name">
+      <paper-tab name="currentSect">Meu endereço atual</paper-tab>
+      <paper-tab name="searchSect">Procurar endereço</paper-tab>
     </paper-tabs>
 
-    <iron-pages selected="{{selected}}">
+    <iron-pages selected="{{locationSect}}" attr-for-selected="name">
   
-      <div>
+      <div name="currentSect">
         <current-location address="{{complaint.address}}"></current-location>
       </div>
   
-      <div>
+      <div name="searchSect">
         <location-search-animilia place="{{complaint.address}}"></location-search-animilia>
       </div>
   
@@ -98,6 +98,11 @@ formulario de entrada de denuncias de maltrato animal
               return [this.$.idInput,this.$.textInput]
             },
             notify: true,
+         },
+
+         locationSect:{
+            type:String,
+            value:'currentSect'
          }       
       },
 
